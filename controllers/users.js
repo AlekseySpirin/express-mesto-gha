@@ -38,17 +38,24 @@ const createUser = (req, res) => {
     });
 };
 
-// const updateUserById = (req, res) => {
-//
-// };
-//
-// const deleteUserById = (req, res) => {
-//
-// };
+const updateUserById = (req, res) => {
+  const updateUserData = req.body;
+  const { id } = req.params;
+  return User.findByIdAndUpdate(id, { updateUserData })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Пользователь не найден' });
+      }
+      return res.status(200).send(user);
+    })
+    .catch(() => {
+      return res.status(500).send({ message: 'Ошибка на сервере' });
+    });
+};
 
 module.exports = {
   getUsers,
   getUsersById,
-  createUser, // updateUserById,
-  // deleteUserById,
+  createUser,
+  updateUserById,
 };

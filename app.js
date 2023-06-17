@@ -9,7 +9,7 @@ const routes = require('./routes');
 const { PORT = 3005 } = process.env;
 
 mongoose
-  .connect('mongodb://127.0.0.1:27017/mestodatabase', {
+  .connect('mongodb://127.0.0.1:27017/mestodb', {
     useNewUrlParser: true,
   })
   .then(() => {

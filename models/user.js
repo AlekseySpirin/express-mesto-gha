@@ -17,31 +17,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     minLength: 2,
     maxLength: 30,
+    require: true,
   },
-  email: {
-    type: String,
-    minLength: 2,
-    maxLength: 30,
-  },
-  places: [
-    {
-      name: {
-        type: String,
-        minLength: 2,
-        maxLength: 30,
-      },
-      link: {
-        type: String,
-        minLength: 2,
-        maxLength: 30,
-      },
-      like: {
-        type: Boolean,
-        default: false,
-        liked: [],
-      },
-    },
-  ],
 });
 
 module.exports = mongoose.model('user', userSchema);

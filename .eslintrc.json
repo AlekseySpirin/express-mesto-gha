@@ -1,0 +1,37 @@
+{
+  "extends": [
+    "airbnb-base",
+    "eslint:recommended",
+    "prettier",
+    "plugin:prettier/recommended",
+    "eslint-config-prettier"
+  ],
+  "plugins": [
+    "prettier"
+  ],
+  "rules": {
+    "class-methods-use-this": "off",
+    "prettier/prettier": [
+      "error",
+      {
+        "single": false
+      }
+    ],
+    "no-console": "off",
+    "import/extensions": [
+      "error",
+      "never"
+    ],
+    "no-underscore-dangle": "off"
+  },
+  "env": {
+    "browser": true,
+    "es2022": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "jsx": true
+  }
+}
