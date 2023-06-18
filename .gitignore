@@ -14,7 +14,7 @@ node_modules
 .DS_Store
 .idea
 .vscode
-.prettierrc.json
+.prettierrc
 
 /public
 # dependencies

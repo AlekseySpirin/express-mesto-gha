@@ -81,7 +81,10 @@ const updateUserAvatarById = (req, res) => {
   return User.findByIdAndUpdate(
     _id,
     { avatar },
-    { new: true, runValidators: true },
+    {
+      new: true,
+      runValidators: true,
+    },
   )
     .then((user) => {
       if (!user) {

@@ -6,9 +6,7 @@
     "plugin:prettier/recommended",
     "eslint-config-prettier"
   ],
-  "plugins": [
-    "prettier"
-  ],
+  "plugins": ["prettier"],
   "rules": {
     "class-methods-use-this": "off",
     "prettier/prettier": [
@@ -18,10 +16,7 @@
       }
     ],
     "no-console": "off",
-    "import/extensions": [
-      "error",
-      "never"
-    ],
+    "import/extensions": ["error", "never"],
     "no-underscore-dangle": "off"
   },
   "env": {

@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { join } = require('path');
 const routes = require('./routes');
+const { notFound, notFoundError } = require('./middlewares/notFound');
 
 const { PORT = 3000 } = process.env;
 
@@ -31,6 +32,8 @@ app.use(bodyParser.json());
 
 app.use(routes);
 
+app.use(notFound);
+app.use(notFoundError);
 app.listen(PORT, () => {
   console.log('Сервер запущен');
 });

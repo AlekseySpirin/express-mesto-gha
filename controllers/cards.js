@@ -2,8 +2,7 @@ const { Types } = require('mongoose');
 const Card = require('../models/card');
 const {
   checkServerError,
-  checkValidationError,
-  // incorrectData,
+  checkValidationError, // incorrectData,
 } = require('../utils/errors');
 
 const checkCard = (req, res) => {
@@ -23,7 +22,11 @@ const getCards = (req, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
-  return Card.create({ name, link, owner })
+  return Card.create({
+    name,
+    link,
+    owner,
+  })
     .then((card) => {
       return res.status(201).send(card);
     })
