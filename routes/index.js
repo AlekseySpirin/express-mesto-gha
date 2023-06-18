@@ -15,6 +15,6 @@ router.use((req, res, next) => {
 });
 
 router.use('/users', userRoutes);
-router.use('/card', cardRoutes);
+router.use('/cards', cardRoutes);
 
 module.exports = router;
