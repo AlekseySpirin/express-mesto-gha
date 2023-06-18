@@ -1,5 +1,9 @@
 const User = require('../models/user');
-const { checkServerError, checkValidationError } = require('../utils/errors');
+const {
+  checkServerError,
+  checkValidationError,
+  incorrectData,
+} = require('../utils/errors');
 
 const checkUser = (req, res) => {
   res.status(404).send({ message: 'Такого пользователя не существует' });
@@ -24,7 +28,10 @@ const getUsersById = (req, res) => {
       }
       return res.status(200).send(user);
     })
-    .catch(() => {
+    .catch((err) => {
+      if (err.name === 'SomeErrorName') {
+        incorrectData(req, res, err);
+      }
       return checkServerError(req, res);
     });
 };
@@ -46,23 +53,32 @@ const createUser = (req, res) => {
 const updateUserById = (req, res) => {
   const newUserData = req.body;
   const { _id } = req.user;
-  return User.findByIdAndUpdate(_id, newUserData, { new: true })
+  return User.findByIdAndUpdate(_id, newUserData, {
+    new: true,
+    runValidators: true,
+  })
     .then((user) => {
       if (!user) {
         return checkUser(req, res);
       }
       return res.status(200).send(user);
     })
-    .catch(() => {
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return checkValidationError(req, res, err);
+      }
       return checkServerError(req, res);
     });
 };
 
 const updateUserAvatarById = (req, res) => {
   const { avatar } = req.body;
-  console.log(avatar);
   const { _id } = req.user;
-  return User.findByIdAndUpdate(_id, { avatar }, { new: true })
+  return User.findByIdAndUpdate(
+    _id,
+    { avatar },
+    { new: true, runValidators: true },
+  )
     .then((user) => {
       if (!user) {
         return checkUser(req, res);

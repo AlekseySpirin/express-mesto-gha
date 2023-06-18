@@ -1,5 +1,10 @@
+const { Types } = require('mongoose');
 const Card = require('../models/card');
-const { checkServerError, checkValidationError } = require('../utils/errors');
+const {
+  checkServerError,
+  checkValidationError,
+  // incorrectData,
+} = require('../utils/errors');
 
 const checkCard = (req, res) => {
   res.status(404).send({ message: 'Такой карточки не существует' });
@@ -16,9 +21,9 @@ const getCards = (req, res) => {
 };
 
 const createCard = (req, res) => {
-  const newCard = req.body;
-  console.log(newCard);
-  return Card.create(newCard)
+  const { name, link } = req.body;
+  const owner = req.user._id;
+  return Card.create({ name, link, owner })
     .then((card) => {
       return res.status(201).send(card);
     })
@@ -32,12 +37,15 @@ const createCard = (req, res) => {
 
 const deleteCardById = (req, res) => {
   const { cardId } = req.params;
+  if (!Types.ObjectId.isValid(cardId)) {
+    return res.status(400).send({ message: 'Некорректный id' });
+  }
   return Card.findByIdAndDelete(cardId)
     .then((card) => {
       if (!card) {
         return checkCard(req, res);
       }
-      return res.status(201).send({ message: 'Карточка удалена' });
+      return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -49,6 +57,9 @@ const deleteCardById = (req, res) => {
 
 const likedCard = (req, res) => {
   const { cardId } = req.params;
+  if (!Types.ObjectId.isValid(cardId)) {
+    return res.status(400).send({ message: 'Некорректный id' });
+  }
   return Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
@@ -58,7 +69,7 @@ const likedCard = (req, res) => {
       if (!card) {
         return checkCard(req, res);
       }
-      return res.status(201).send({ message: 'Лайк добавлен' });
+      return res.status(201).send(card);
     })
     .catch(() => {
       return checkServerError(req, res);
@@ -67,6 +78,9 @@ const likedCard = (req, res) => {
 
 const dislikedCard = (req, res) => {
   const { cardId } = req.params;
+  if (!Types.ObjectId.isValid(cardId)) {
+    return res.status(400).send({ message: 'Некорректный id' });
+  }
   return Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },

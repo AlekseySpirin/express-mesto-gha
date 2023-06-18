@@ -10,7 +10,16 @@ const checkValidationError = (req, res, err) => {
   });
 };
 
+const incorrectData = (req, res, err) => {
+  return res.status(400).send({
+    message: `${Object.values(err.errors)
+      .map((error) => error.message)
+      .join(', ')}`,
+  });
+};
+
 module.exports = {
   checkServerError,
   checkValidationError,
+  incorrectData,
 };
