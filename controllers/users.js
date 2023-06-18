@@ -1,13 +1,13 @@
-const { Types } = require('mongoose');
-const User = require('../models/user');
+const { Types } = require("mongoose");
+const User = require("../models/user");
 const {
   checkServerError,
   checkValidationError,
   incorrectData,
-} = require('../utils/errors');
+} = require("../utils/errors");
 
 const checkUser = (req, res) => {
-  res.status(404).send({ message: 'Такого пользователя не существует' });
+  res.status(404).send({ message: "Такого пользователя не существует" });
 };
 
 const getUsers = (req, res) => {
@@ -23,7 +23,7 @@ const getUsers = (req, res) => {
 const getUsersById = (req, res) => {
   const { userId } = req.params;
   if (!Types.ObjectId.isValid(userId)) {
-    return res.status(400).send({ message: 'Некорректный id' });
+    return res.status(400).send({ message: "Некорректный id" });
   }
   return User.findById(userId)
     .then((user) => {
@@ -33,7 +33,7 @@ const getUsersById = (req, res) => {
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'SomeErrorName') {
+      if (err.name === "SomeErrorName") {
         incorrectData(req, res, err);
       }
       return checkServerError(req, res);
@@ -47,7 +47,7 @@ const createUser = (req, res) => {
       return res.status(201).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         return checkValidationError(req, res, err);
       }
       return checkServerError(req, res);
@@ -68,7 +68,7 @@ const updateUserById = (req, res) => {
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         return checkValidationError(req, res, err);
       }
       return checkServerError(req, res);
@@ -93,7 +93,7 @@ const updateUserAvatarById = (req, res) => {
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         return checkValidationError(req, res, err);
       }
       return checkServerError(req, res);

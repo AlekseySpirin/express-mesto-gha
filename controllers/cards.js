@@ -1,12 +1,12 @@
-const { Types } = require('mongoose');
-const Card = require('../models/card');
+const { Types } = require("mongoose");
+const Card = require("../models/card");
 const {
   checkServerError,
   checkValidationError, // incorrectData,
-} = require('../utils/errors');
+} = require("../utils/errors");
 
 const checkCard = (req, res) => {
-  res.status(404).send({ message: 'Такой карточки не существует' });
+  res.status(404).send({ message: "Такой карточки не существует" });
 };
 
 const getCards = (req, res) => {
@@ -31,7 +31,7 @@ const createCard = (req, res) => {
       return res.status(201).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         return checkValidationError(req, res, err);
       }
       return checkServerError(req, res);
@@ -41,7 +41,7 @@ const createCard = (req, res) => {
 const deleteCardById = (req, res) => {
   const { cardId } = req.params;
   if (!Types.ObjectId.isValid(cardId)) {
-    return res.status(400).send({ message: 'Некорректный id' });
+    return res.status(400).send({ message: "Некорректный id" });
   }
   return Card.findByIdAndDelete(cardId)
     .then((card) => {
@@ -51,7 +51,7 @@ const deleteCardById = (req, res) => {
       return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         return checkValidationError(req, res, err);
       }
       return checkServerError(req, res);
@@ -61,7 +61,7 @@ const deleteCardById = (req, res) => {
 const likedCard = (req, res) => {
   const { cardId } = req.params;
   if (!Types.ObjectId.isValid(cardId)) {
-    return res.status(400).send({ message: 'Некорректный id' });
+    return res.status(400).send({ message: "Некорректный id" });
   }
   return Card.findByIdAndUpdate(
     cardId,
@@ -82,7 +82,7 @@ const likedCard = (req, res) => {
 const dislikedCard = (req, res) => {
   const { cardId } = req.params;
   if (!Types.ObjectId.isValid(cardId)) {
-    return res.status(400).send({ message: 'Некорректный id' });
+    return res.status(400).send({ message: "Некорректный id" });
   }
   return Card.findByIdAndUpdate(
     cardId,
@@ -93,7 +93,7 @@ const dislikedCard = (req, res) => {
       if (!card) {
         return checkCard(req, res);
       }
-      return res.status(200).send({ message: 'Лайк удален' });
+      return res.status(200).send({ message: "Лайк удален" });
     })
     .catch(() => {
       return checkServerError(req, res);
