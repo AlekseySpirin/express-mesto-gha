@@ -2,7 +2,7 @@ const { Types } = require("mongoose");
 const Card = require("../models/card");
 const {
   checkServerError,
-  checkValidationError, // incorrectData,
+  checkValidationError // incorrectData,
 } = require("../utils/errors");
 
 const checkCard = (req, res) => {
@@ -25,7 +25,7 @@ const createCard = (req, res) => {
   return Card.create({
     name,
     link,
-    owner,
+    owner
   })
     .then((card) => {
       return res.status(201).send(card);
@@ -66,7 +66,7 @@ const likedCard = (req, res) => {
   return Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (!card) {
@@ -87,7 +87,7 @@ const dislikedCard = (req, res) => {
   return Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (!card) {
@@ -105,5 +105,5 @@ module.exports = {
   createCard,
   deleteCardById,
   likedCard,
-  dislikedCard,
+  dislikedCard
 };

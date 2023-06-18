@@ -11,7 +11,7 @@ const { PORT = 3000 } = process.env;
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/mestodb", {
-    useNewUrlParser: true,
+    useNewUrlParser: true
   })
   .then(() => {
     console.log("База подключена");
@@ -21,7 +21,7 @@ const app = express();
 
 app.use((req, res, next) => {
   req.user = {
-    _id: "648ec99e0e83571338a9f641",
+    _id: "648ec99e0e83571338a9f641"
   };
   next();
 });

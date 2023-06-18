@@ -3,7 +3,7 @@ const User = require("../models/user");
 const {
   checkServerError,
   checkValidationError,
-  incorrectData,
+  incorrectData
 } = require("../utils/errors");
 
 const checkUser = (req, res) => {
@@ -59,7 +59,7 @@ const updateUserById = (req, res) => {
   const { _id } = req.user;
   return User.findByIdAndUpdate(_id, newUserData, {
     new: true,
-    runValidators: true,
+    runValidators: true
   })
     .then((user) => {
       if (!user) {
@@ -83,8 +83,8 @@ const updateUserAvatarById = (req, res) => {
     { avatar },
     {
       new: true,
-      runValidators: true,
-    },
+      runValidators: true
+    }
   )
     .then((user) => {
       if (!user) {
@@ -105,5 +105,5 @@ module.exports = {
   getUsersById,
   createUser,
   updateUserById,
-  updateUserAvatarById,
+  updateUserAvatarById
 };
