@@ -1,3 +1,4 @@
+const { Types } = require('mongoose');
 const User = require('../models/user');
 const {
   checkServerError,
@@ -21,6 +22,9 @@ const getUsers = (req, res) => {
 
 const getUsersById = (req, res) => {
   const { userId } = req.params;
+  if (!Types.ObjectId.isValid(userId)) {
+    return res.status(400).send({ message: 'Некорректный id' });
+  }
   return User.findById(userId)
     .then((user) => {
       if (!user) {

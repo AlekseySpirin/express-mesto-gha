@@ -90,7 +90,7 @@ const dislikedCard = (req, res) => {
       if (!card) {
         return checkCard(req, res);
       }
-      return res.status(201).send({ message: 'Лайк удален' });
+      return res.status(200).send({ message: 'Лайк удален' });
     })
     .catch(() => {
       return checkServerError(req, res);
