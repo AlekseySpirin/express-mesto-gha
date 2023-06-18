@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const { join } = require('path');
 const routes = require('./routes');
 
-const { PORT = 3005 } = process.env;
+const { PORT = 3000 } = process.env;
 
 mongoose
   .connect('mongodb://127.0.0.1:27017/mestodb', {
@@ -18,6 +18,13 @@ mongoose
 
 const app = express();
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: '648ec99e0e83571338a9f641',
+  };
+  next();
+});
+
 app.use(express.static(join(__dirname, 'public')));
 
 app.use(bodyParser.json());
@@ -25,5 +32,5 @@ app.use(bodyParser.json());
 app.use(routes);
 
 app.listen(PORT, () => {
-  console.log('start server');
+  console.log('Сервер запущен');
 });

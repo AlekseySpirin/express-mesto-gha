@@ -1,9 +1,18 @@
 const User = require('../models/user');
+const { checkServerError, checkValidationError } = require('../utils/errors');
+
+const checkUser = (req, res) => {
+  res.status(404).send({ message: 'Такого пользователя не существует' });
+};
 
 const getUsers = (req, res) => {
-  return User.find({}).then((users) => {
-    return res.status(200).send(users);
-  });
+  return User.find({})
+    .then((users) => {
+      return res.status(200).send(users);
+    })
+    .catch(() => {
+      return checkServerError(req, res);
+    });
 };
 
 const getUsersById = (req, res) => {
@@ -11,12 +20,12 @@ const getUsersById = (req, res) => {
   return User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Пользователь не найден' });
+        return checkUser(req, res);
       }
       return res.status(200).send(user);
     })
     .catch(() => {
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      return checkServerError(req, res);
     });
 };
 
@@ -28,13 +37,9 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: `${Object.values(err.errors)
-            .map((error) => error.message)
-            .join(', ')}`,
-        });
+        return checkValidationError(req, res, err);
       }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      return checkServerError(req, res);
     });
 };
 
@@ -44,12 +49,12 @@ const updateUserById = (req, res) => {
   return User.findByIdAndUpdate(_id, newUserData, { new: true })
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Пользователь не найден' });
+        return checkUser(req, res);
       }
       return res.status(200).send(user);
     })
     .catch(() => {
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      return checkServerError(req, res);
     });
 };
 
@@ -58,18 +63,17 @@ const updateUserAvatarById = (req, res) => {
   console.log(avatar);
   const { _id } = req.user;
   return User.findByIdAndUpdate(_id, { avatar }, { new: true })
-    .then((newAvatar) => {
-      return res.status(200).send(newAvatar);
+    .then((user) => {
+      if (!user) {
+        return checkUser(req, res);
+      }
+      return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: `${Object.values(err.errors)
-            .map((error) => error.message)
-            .join(', ')}`,
-        });
+        return checkValidationError(req, res, err);
       }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      return checkServerError(req, res);
     });
 };
 

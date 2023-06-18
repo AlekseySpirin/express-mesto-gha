@@ -1,4 +1,9 @@
 const Card = require('../models/card');
+const { checkServerError, checkValidationError } = require('../utils/errors');
+
+const checkCard = (req, res) => {
+  res.status(404).send({ message: 'Такой карточки не существует' });
+};
 
 const getCards = (req, res) => {
   return Card.find({})
@@ -6,7 +11,7 @@ const getCards = (req, res) => {
       return res.status(200).send(cards);
     })
     .catch(() => {
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      return checkServerError(req, res);
     });
 };
 
@@ -19,13 +24,9 @@ const createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: `${Object.values(err.errors)
-            .map((error) => error.message)
-            .join(', ')}`,
-        });
+        return checkValidationError(req, res, err);
       }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      return checkServerError(req, res);
     });
 };
 
@@ -34,19 +35,51 @@ const deleteCardById = (req, res) => {
   return Card.findByIdAndDelete(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(404).send({ message: 'Пользователь не найден' });
+        return checkCard(req, res);
       }
       return res.status(201).send({ message: 'Карточка удалена' });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: `${Object.values(err.errors)
-            .map((error) => error.message)
-            .join(', ')}`,
-        });
+        return checkValidationError(req, res, err);
       }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      return checkServerError(req, res);
+    });
+};
+
+const likedCard = (req, res) => {
+  const { cardId } = req.params;
+  return Card.findByIdAndUpdate(
+    cardId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
+  )
+    .then((card) => {
+      if (!card) {
+        return checkCard(req, res);
+      }
+      return res.status(201).send({ message: 'Лайк добавлен' });
+    })
+    .catch(() => {
+      return checkServerError(req, res);
+    });
+};
+
+const dislikedCard = (req, res) => {
+  const { cardId } = req.params;
+  return Card.findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  )
+    .then((card) => {
+      if (!card) {
+        return checkCard(req, res);
+      }
+      return res.status(201).send({ message: 'Лайк удален' });
+    })
+    .catch(() => {
+      return checkServerError(req, res);
     });
 };
 
@@ -54,4 +87,6 @@ module.exports = {
   getCards,
   createCard,
   deleteCardById,
+  likedCard,
+  dislikedCard,
 };
