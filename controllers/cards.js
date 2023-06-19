@@ -11,6 +11,7 @@ const checkCard = (req, res) => {
 
 const getCards = (req, res) => {
   return Card.find({})
+    .populate(["owner", "likes"])
     .then((cards) => {
       return res.status(200).send(cards);
     })
@@ -72,7 +73,7 @@ const likedCard = (req, res) => {
       if (!card) {
         return checkCard(req, res);
       }
-      return res.status(201).send(card);
+      return res.status(200).send(card);
     })
     .catch(() => {
       return checkServerError(req, res);

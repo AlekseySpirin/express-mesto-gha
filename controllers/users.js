@@ -1,40 +1,39 @@
 const { Types } = require("mongoose");
 const User = require("../models/user");
-const {
-  checkServerError,
-  checkValidationError,
-  incorrectData
-} = require("../utils/errors");
+const { checkServerError, checkValidationError } = require("../utils/errors");
 
 const checkUser = (req, res) => {
   res.status(404).send({ message: "Такого пользователя не существует" });
 };
 
 const getUsers = (req, res) => {
-  return User.find({})
-    .then((users) => {
-      return res.status(200).send(users);
-    })
-    .catch(() => {
-      return checkServerError(req, res);
-    });
+  return (
+    User.find({})
+      // .populate(["owner", "likes"])
+      // .populate("cards")
+      .then((users) => {
+        return res.status(200).send(users);
+      })
+      .catch(() => {
+        return checkServerError(req, res);
+      })
+  );
 };
 
 const getUsersById = (req, res) => {
   const { userId } = req.params;
-  if (!Types.ObjectId.isValid(userId)) {
-    return res.status(400).send({ message: "Некорректный id" });
-  }
+
   return User.findById(userId)
+    .orFail(new Error("NotValidId"))
     .then((user) => {
-      if (!user) {
-        return checkUser(req, res);
-      }
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === "SomeErrorName") {
-        incorrectData(req, res, err);
+      if (err.message === "NotValidId") {
+        return checkUser(req, res);
+      }
+      if (!Types.ObjectId.isValid(userId)) {
+        return res.status(400).send({ message: "Некорректный id" });
       }
       return checkServerError(req, res);
     });
@@ -61,13 +60,14 @@ const updateUserById = (req, res) => {
     new: true,
     runValidators: true
   })
+    .orFail(new Error("NotValidId"))
     .then((user) => {
-      if (!user) {
-        return checkUser(req, res);
-      }
       return res.status(200).send(user);
     })
     .catch((err) => {
+      if (err.message === "NotValidId") {
+        return checkUser(req, res);
+      }
       if (err.name === "ValidationError") {
         return checkValidationError(req, res, err);
       }
@@ -86,13 +86,14 @@ const updateUserAvatarById = (req, res) => {
       runValidators: true
     }
   )
+    .orFail(new Error("NotValidId"))
     .then((user) => {
-      if (!user) {
-        return checkUser(req, res);
-      }
       return res.status(200).send(user);
     })
     .catch((err) => {
+      if (err.message === "NotValidId") {
+        return checkUser(req, res);
+      }
       if (err.name === "ValidationError") {
         return checkValidationError(req, res, err);
       }
