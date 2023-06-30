@@ -1,4 +1,6 @@
 const { Types } = require("mongoose");
+// eslint-disable-next-line import/no-extraneous-dependencies
+const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { checkServerError, checkValidationError } = require("../utils/errors");
 
@@ -7,17 +9,13 @@ const checkUser = (req, res) => {
 };
 
 const getUsers = (req, res) => {
-  return (
-    User.find({})
-      // .populate(["owner", "likes"])
-      // .populate("cards")
-      .then((users) => {
-        return res.status(200).send(users);
-      })
-      .catch(() => {
-        return checkServerError(req, res);
-      })
-  );
+  return User.find({})
+    .then((users) => {
+      return res.status(200).send(users);
+    })
+    .catch(() => {
+      return checkServerError(req, res);
+    });
 };
 
 const getUsersById = (req, res) => {
@@ -40,10 +38,26 @@ const getUsersById = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const newUser = req.body;
-  return User.create(newUser)
-    .then((user) => {
-      return res.status(201).send(user);
+  const {
+    name = "Жак-Ив Кусто",
+    about = "Исследователь",
+    avatar = "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+    email,
+    password
+  } = req.body;
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => {
+      return User.create({ name, about, avatar, email, password: hash })
+        .then((user) => {
+          return res.status(201).send(user);
+        })
+        .catch((err) => {
+          if (err.name === "ValidationError") {
+            return checkValidationError(req, res, err);
+          }
+          return checkServerError(req, res);
+        });
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
