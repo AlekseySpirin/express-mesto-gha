@@ -1,14 +1,22 @@
 const { Types } = require("mongoose");
 // eslint-disable-next-line import/no-extraneous-dependencies
 const bcrypt = require("bcrypt");
+// eslint-disable-next-line import/no-extraneous-dependencies
 const User = require("../models/user");
 const { checkServerError, checkValidationError } = require("../utils/errors");
+const { generateToken, verifyToken } = require("../utils/jwt");
 
+const SALT_ROUNDS = 10;
 const checkUser = (req, res) => {
   res.status(404).send({ message: "Такого пользователя не существует" });
 };
 
 const getUsers = (req, res) => {
+  console.log(req.headers.authorization);
+  if (!verifyToken(req.headers.authorization)) {
+    return res.status(403).send({ message: "Нет доступа" });
+  }
+
   return User.find({})
     .then((users) => {
       return res.status(200).send(users);
@@ -45,19 +53,26 @@ const createUser = (req, res) => {
     email,
     password
   } = req.body;
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => {
-      return User.create({ name, about, avatar, email, password: hash })
-        .then((user) => {
-          return res.status(201).send(user);
-        })
-        .catch((err) => {
-          if (err.name === "ValidationError") {
-            return checkValidationError(req, res, err);
-          }
-          return checkServerError(req, res);
+  if (!email || !password) {
+    return res.status(400).send({ message: "Не передан email или пароль" });
+  }
+
+  return User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        return res.status(409).send({ message: "Пользователь уже существует" });
+      }
+      return bcrypt.hash(password, SALT_ROUNDS, function (err, hash) {
+        return User.create({
+          name,
+          about,
+          avatar,
+          email,
+          password: hash
+        }).then((userData) => {
+          return res.status(201).send(userData);
         });
+      });
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -115,10 +130,44 @@ const updateUserAvatarById = (req, res) => {
     });
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(403).send({ message: "Неправильный email или пароль" });
+  }
+
+  return User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return res
+          .status(403)
+          .send({ message: "Такого пользователя не существует" });
+      }
+      return bcrypt.compare(
+        password,
+        user.password,
+        function (err, isPasswordMatch) {
+          if (!isPasswordMatch) {
+            return res.status(403).send({ message: "Неправильный пароль" });
+          }
+          const token = generateToken(user._id);
+          return res.status(200).send({ token });
+        }
+      );
+    })
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return checkValidationError(req, res, err);
+      }
+      return checkServerError(req, res);
+    });
+};
+
 module.exports = {
   getUsers,
   getUsersById,
   createUser,
   updateUserById,
-  updateUserAvatarById
+  updateUserAvatarById,
+  login
 };
