@@ -1,5 +1,30 @@
 const { celebrate, Joi, Segments } = require("celebrate");
+const {
+  nameSchema,
+  aboutSchema,
+  avatarSchema,
+  emailSchema,
+  passwordSchema
+} = require("./joiSchemas");
+// eslint-disable-next-line import/order
 const { ObjectId } = require("mongoose").Types;
+
+const createUserValidator = celebrate({
+  body: Joi.object().keys({
+    name: nameSchema,
+    about: aboutSchema,
+    avatar: avatarSchema,
+    email: emailSchema,
+    password: passwordSchema
+  })
+});
+
+const updateUserValidator = celebrate({
+  body: Joi.object().keys({
+    name: nameSchema,
+    about: aboutSchema
+  })
+});
 
 const getUserByIdValidator = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
@@ -15,5 +40,7 @@ const getUserByIdValidator = celebrate({
 });
 
 module.exports = {
-  getUserByIdValidator
+  getUserByIdValidator,
+  createUserValidator,
+  updateUserValidator
 };
