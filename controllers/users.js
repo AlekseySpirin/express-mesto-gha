@@ -110,5 +110,6 @@ module.exports = {
   getUsersById,
   updateUserById,
   updateUserAvatarById,
-  getCurrentUser
+  getCurrentUser,
+  checkUser
 };

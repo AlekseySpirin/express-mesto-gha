@@ -10,6 +10,7 @@ const login = (req, res) => {
   }
 
   return User.findOne({ email })
+    .select("+password")
     .then((user) => {
       if (!user) {
         return res

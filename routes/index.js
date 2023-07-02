@@ -6,10 +6,6 @@ const registerRouter = require("./register");
 const { notFound } = require("../middlewares/notFound");
 const { auth } = require("../middlewares/auth");
 
-router.get("/", (req, res) => {
-  res.send("hello!!!");
-});
-
 router.use("/", loginRouter);
 
 router.use("/", registerRouter);

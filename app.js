@@ -18,14 +18,6 @@ mongoose
   });
 
 const app = express();
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: "648ec99e0e83571338a9f641"
-  };
-  next();
-});
-
 app.use(express.static(join(__dirname, "public")));
 app.use(helmet());
 app.use(bodyParser.json());
