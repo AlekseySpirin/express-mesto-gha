@@ -6,6 +6,7 @@ const {
   avatarSchema,
   emailSchema,
   passwordSchema,
+  namePlaceSchema,
   linkSchema
 } = require("./joiSchemas");
 // eslint-disable-next-line import/order
@@ -13,7 +14,7 @@ const { ObjectId } = require("mongoose").Types;
 
 const createCardValidator = celebrate({
   body: Joi.object().keys({
-    name: nameSchema,
+    name: namePlaceSchema,
     link: linkSchema
   })
 });
