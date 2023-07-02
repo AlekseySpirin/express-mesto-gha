@@ -14,7 +14,7 @@ const login = (req, res) => {
     .then((user) => {
       if (!user) {
         return res
-          .status(403)
+          .status(401)
           .send({ message: "Такого пользователя не существует" });
       }
       return bcrypt.compare(

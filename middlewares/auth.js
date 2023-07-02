@@ -9,7 +9,6 @@ const auth = (req, res, next) => {
     return next(error);
   }
   const userId = decryptToken(token);
-  console.log(userId);
   User.findById(userId)
     .then((user) => {
       if (!user) {
