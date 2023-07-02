@@ -8,7 +8,7 @@ const {
   getCurrentUser
 } = require("../controllers/users");
 const {
-  // getByIdValidator,
+  getByIdValidator,
   updateUserValidator,
   updateUserAvatar
 } = require("../validation/validationRules");
@@ -17,7 +17,7 @@ router.get("/", getUsers);
 
 router.get("/me", getCurrentUser);
 
-router.get("/:userId", getUsersById);
+router.get("/:userId", getByIdValidator, getUsersById);
 
 router.patch("/me", updateUserValidator, updateUserById);
 
