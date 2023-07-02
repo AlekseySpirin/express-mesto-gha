@@ -1,7 +1,7 @@
 const express = require("express");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
-
+const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const { join } = require("path");
 const routes = require("./routes");
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
 app.use(express.static(join(__dirname, "public")));
 app.use(helmet());
 app.use(bodyParser.json());
-
+app.use(cookieParser());
 app.use(routes);
 
 app.use(notFound);
