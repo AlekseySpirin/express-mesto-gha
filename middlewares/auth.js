@@ -3,7 +3,9 @@ const { verifyToken } = require("../utils/jwt");
 const auth = (req, res, next) => {
   const token = req.cookies.jwt;
   if (!verifyToken(token)) {
-    return res.status(401).send({ message: "Нет доступа" });
+    const error = new Error("Нет доступа");
+    error.statusCode = 401;
+    return next(error);
   }
 
   return next();

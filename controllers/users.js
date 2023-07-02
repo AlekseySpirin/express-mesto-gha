@@ -1,9 +1,31 @@
 const { Types } = require("mongoose");
 const User = require("../models/user");
 const { checkServerError, checkValidationError } = require("../utils/errors");
+const { decryptToken } = require("../utils/jwt");
 
 const checkUser = (req, res) => {
   res.status(404).send({ message: "Такого пользователя не существует" });
+};
+
+const getCurrentUser = (req, res) => {
+  const token = req.cookies.jwt;
+  console.log(token);
+  const currentUserId = decryptToken(token);
+  console.log(currentUserId);
+  return User.findById(currentUserId)
+    .orFail(new Error("NotValidId"))
+    .then((user) => {
+      return res.status(200).send(user);
+    })
+    .catch((err) => {
+      if (err.message === "NotValidId") {
+        return checkUser(req, res);
+      }
+      if (!Types.ObjectId.isValid(currentUserId)) {
+        return res.status(400).send({ message: "Некорректный id" });
+      }
+      return checkServerError(req, res);
+    });
 };
 
 const getUsers = (req, res) => {
@@ -87,5 +109,6 @@ module.exports = {
   getUsers,
   getUsersById,
   updateUserById,
-  updateUserAvatarById
+  updateUserAvatarById,
+  getCurrentUser
 };

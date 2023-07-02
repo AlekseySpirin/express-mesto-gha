@@ -16,7 +16,16 @@ const verifyToken = (token) => {
   });
 };
 
+const decryptToken = (token) => {
+  return jwt.verify(token, JWT_SECRET, function (err, decoded) {
+    if (err) return false;
+
+    return decoded.id;
+  });
+};
+
 module.exports = {
   generateToken,
-  verifyToken
+  verifyToken,
+  decryptToken
 };
