@@ -8,18 +8,19 @@ const {
   getCurrentUser
 } = require("../controllers/users");
 const {
-  getUserByIdValidator,
-  updateUserValidator
+  getByIdValidator,
+  updateUserValidator,
+  updateUserAvatar
 } = require("../validation/validationRules");
 
 router.get("/", getUsers);
 
 router.get("/me", getCurrentUser);
 
-router.get("/:userId", getUserByIdValidator, getUsersById);
+router.get("/:userId", getByIdValidator, getUsersById);
 
 router.patch("/me", updateUserValidator, updateUserById);
 
-router.patch("/me/avatar", updateUserAvatarById);
+router.patch("/me/avatar", updateUserAvatar, updateUserAvatarById);
 
 module.exports = router;

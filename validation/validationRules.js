@@ -5,10 +5,18 @@ const {
   aboutSchema,
   avatarSchema,
   emailSchema,
-  passwordSchema
+  passwordSchema,
+  linkSchema
 } = require("./joiSchemas");
 // eslint-disable-next-line import/order
 const { ObjectId } = require("mongoose").Types;
+
+const createCardValidator = celebrate({
+  body: Joi.object().keys({
+    name: nameSchema,
+    link: linkSchema
+  })
+});
 
 const createUserValidator = celebrate({
   body: Joi.object().keys({
@@ -27,13 +35,19 @@ const updateUserValidator = celebrate({
   })
 });
 
-const getUserByIdValidator = celebrate({
+const updateUserAvatar = celebrate({
+  body: Joi.object().keys({
+    avatar: avatarSchema
+  })
+});
+
+const getByIdValidator = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    userId: Joi.string()
+    Id: Joi.string()
       .required()
       .custom((value, helpers) => {
         if (!ObjectId.isValid(value)) {
-          return helpers.message("Некорректный id пользователя");
+          return helpers.message("Некорректный id");
         }
         return value;
       })
@@ -41,7 +55,9 @@ const getUserByIdValidator = celebrate({
 });
 
 module.exports = {
-  getUserByIdValidator,
+  getByIdValidator,
   createUserValidator,
-  updateUserValidator
+  updateUserValidator,
+  updateUserAvatar,
+  createCardValidator
 };

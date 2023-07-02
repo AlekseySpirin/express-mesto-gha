@@ -7,11 +7,16 @@ const avatarSchema = Joi.string()
   .regex(/^https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp)$/i);
 const emailSchema = Joi.string().email().required();
 const passwordSchema = Joi.string().required();
+const linkSchema = Joi.object({
+  href: Joi.string().uri().required(),
+  text: Joi.string().required()
+}).required();
 
 module.exports = {
   nameSchema,
   aboutSchema,
   avatarSchema,
   emailSchema,
-  passwordSchema
+  passwordSchema,
+  linkSchema
 };

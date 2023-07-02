@@ -41,20 +41,39 @@ const createCard = (req, res) => {
 
 const deleteCardById = (req, res) => {
   const { cardId } = req.params;
+  const userId = req.user._id;
   if (!Types.ObjectId.isValid(cardId)) {
     return res.status(400).send({ message: "Некорректный id" });
   }
-  return Card.findByIdAndDelete(cardId)
+
+  return Card.findById(cardId)
     .then((card) => {
       if (!card) {
         return checkCard(req, res);
       }
-      return res.status(200).send(card);
-    })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return checkValidationError(req, res, err);
+      if (card.owner._id !== userId) {
+        return res
+          .status(403)
+          .send({ message: "Нет прав на удаление карточки" });
       }
+      return (
+        Card.findByIdAndDelete(cardId)
+          // eslint-disable-next-line no-shadow
+          .then((card) => {
+            if (!card) {
+              return checkCard(req, res);
+            }
+            return res.status(200).send(card);
+          })
+          .catch((err) => {
+            if (err.name === "ValidationError") {
+              return checkValidationError(req, res, err);
+            }
+            return checkServerError(req, res);
+          })
+      );
+    })
+    .catch(() => {
       return checkServerError(req, res);
     });
 };
