@@ -19,12 +19,11 @@ router.use("/users", userRoutes);
 
 router.use("/cards", cardRoutes);
 
-router.use(errors());
-
-router.use(celebrateError);
-
 router.use(notFound);
 
 router.use(errorHandler);
 
+router.use(errors());
+
+router.use(celebrateError);
 module.exports = router;
