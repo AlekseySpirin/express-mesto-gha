@@ -7,12 +7,14 @@ const {
   updateUserAvatarById,
   getCurrentUser
 } = require("../controllers/users");
+// eslint-disable-next-line import/no-unresolved
+const { getUserByIdValidator } = require("../validation/validationRules");
 
 router.get("/", getUsers);
 
 router.get("/me", getCurrentUser);
 
-router.get("/:userId", getUsersById);
+router.get("/:userId", getUserByIdValidator, getUsersById);
 
 router.patch("/me", updateUserById);
 
