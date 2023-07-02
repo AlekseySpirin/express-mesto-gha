@@ -1,4 +1,5 @@
-const { celebrate, Joi, Segments } = require("celebrate");
+const { celebrate, Segments } = require("celebrate");
+const Joi = require("joi");
 const {
   nameSchema,
   aboutSchema,

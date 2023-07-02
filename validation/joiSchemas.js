@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const Joi = require("joi");
 
 const nameSchema = Joi.string().min(2).max(30);
