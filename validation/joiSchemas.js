@@ -11,7 +11,8 @@ const passwordSchema = Joi.string().required();
 const namePlaceSchema = Joi.string().min(2).max(30).required();
 const linkSchema = Joi.string()
   .uri({ scheme: ["http", "https"] })
-  .regex(/^https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp)$/i);
+  .regex(/^https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|test)$/i)
+  .required();
 
 module.exports = {
   nameSchema,

@@ -42,9 +42,9 @@ const updateUserAvatar = celebrate({
   })
 });
 
-const getByIdValidator = celebrate({
+const getUserByIdValidator = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    Id: Joi.string()
+    userId: Joi.string()
       .required()
       .custom((value, helpers) => {
         if (!ObjectId.isValid(value)) {
@@ -55,10 +55,24 @@ const getByIdValidator = celebrate({
   })
 });
 
+const getCardByIdValidator = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    cardId: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (!ObjectId.isValid(value)) {
+          return helpers.message("Некорректный id карточки");
+        }
+        return value;
+      })
+  })
+});
+
 module.exports = {
-  getByIdValidator,
+  getUserByIdValidator,
   createUserValidator,
   updateUserValidator,
   updateUserAvatar,
-  createCardValidator
+  createCardValidator,
+  getCardByIdValidator
 };
