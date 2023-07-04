@@ -4,7 +4,11 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const { join } = require("path");
+const { errors } = require("celebrate");
 const routes = require("./routes");
+const { notFound } = require("./middlewares/notFound");
+const { errorHandler } = require("./middlewares/errorHandler");
+const { celebrateError } = require("./middlewares/celebrateError");
 
 const { PORT = 3000 } = process.env;
 
@@ -22,6 +26,11 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(routes);
+
+app.use(notFound);
+app.use(errors());
+app.use(errorHandler);
+app.use(celebrateError);
 
 app.listen(PORT, () => {
   console.log("Сервер запущен");

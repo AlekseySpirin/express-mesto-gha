@@ -22,7 +22,7 @@ const login = (req, res) => {
         user.password,
         function (err, isPasswordMatch) {
           if (!isPasswordMatch) {
-            return res.status(403).send({ message: "Неправильный пароль" });
+            return res.status(401).send({ message: "Неправильный пароль" });
           }
           const token = generateToken(user._id);
           res.cookie("jwt", token, { httpOnly: true });

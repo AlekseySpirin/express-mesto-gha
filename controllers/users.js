@@ -1,85 +1,55 @@
-const { Types } = require("mongoose");
 const User = require("../models/user");
-const { checkServerError, checkValidationError } = require("../utils/errors");
-const { decryptToken } = require("../utils/jwt");
+const NotFoundError = require("../errors/notFoundError");
 
-const checkUser = (req, res) => {
-  res.status(404).send({ message: "Такого пользователя не существует" });
-};
+const getCurrentUser = (req, res, next) => {
+  const { _id } = req.user._id;
 
-const getCurrentUser = (req, res) => {
-  const token = req.cookies.jwt;
-  console.log(token);
-  const currentUserId = decryptToken(token);
-  console.log(currentUserId);
-  return User.findById(currentUserId)
-    .orFail(new Error("NotValidId"))
+  return User.findById(_id)
     .then((user) => {
       return res.status(200).send(user);
     })
-    .catch((err) => {
-      if (err.message === "NotValidId") {
-        return checkUser(req, res);
-      }
-      if (!Types.ObjectId.isValid(currentUserId)) {
-        return res.status(400).send({ message: "Некорректный id" });
-      }
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   return User.find({})
     .then((users) => {
       return res.status(200).send(users);
     })
-    .catch(() => {
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
-const getUsersById = (req, res) => {
+const getUsersById = (req, res, next) => {
   const { userId } = req.params;
 
   return User.findById(userId)
     .orFail(new Error("NotValidId"))
     .then((user) => {
+      if (!user) {
+        throw new NotFoundError("Пользователь не существует");
+      }
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.message === "NotValidId") {
-        return checkUser(req, res);
-      }
-      if (!Types.ObjectId.isValid(userId)) {
-        return res.status(400).send({ message: "Некорректный id" });
-      }
-      return checkServerError(req, res);
+      next(err);
     });
 };
 
-const updateUserById = (req, res) => {
+const updateUserById = (req, res, next) => {
   const newUserData = req.body;
   const { _id } = req.user;
+  // console.log(new Error("NotValidId"));
   return User.findByIdAndUpdate(_id, newUserData, {
     new: true,
     runValidators: true
   })
-    .orFail(new Error("NotValidId"))
     .then((user) => {
       return res.status(200).send(user);
     })
-    .catch((err) => {
-      if (err.message === "NotValidId") {
-        return checkUser(req, res);
-      }
-      if (err.name === "ValidationError") {
-        return checkValidationError(req, res, err);
-      }
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
-const updateUserAvatarById = (req, res) => {
+const updateUserAvatarById = (req, res, next) => {
   const { avatar } = req.body;
   const { _id } = req.user;
   return User.findByIdAndUpdate(
@@ -90,19 +60,10 @@ const updateUserAvatarById = (req, res) => {
       runValidators: true
     }
   )
-    .orFail(new Error("NotValidId"))
     .then((user) => {
       return res.status(200).send(user);
     })
-    .catch((err) => {
-      if (err.message === "NotValidId") {
-        return checkUser(req, res);
-      }
-      if (err.name === "ValidationError") {
-        return checkValidationError(req, res, err);
-      }
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
 module.exports = {
@@ -110,6 +71,5 @@ module.exports = {
   getUsersById,
   updateUserById,
   updateUserAvatarById,
-  getCurrentUser,
-  checkUser
+  getCurrentUser
 };

@@ -4,20 +4,15 @@ const {
   checkServerError,
   checkValidationError // incorrectData,
 } = require("../utils/errors");
+const { notFound } = require("../middlewares/notFound");
 
-const checkCard = (req, res) => {
-  res.status(404).send({ message: "Такой карточки не существует" });
-};
-
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   return Card.find({})
     .populate(["owner", "likes"])
     .then((cards) => {
       return res.status(200).send(cards);
     })
-    .catch(() => {
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
 const createCard = (req, res) => {
@@ -39,7 +34,7 @@ const createCard = (req, res) => {
     });
 };
 
-const deleteCardById = (req, res) => {
+const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   if (!Types.ObjectId.isValid(cardId)) {
@@ -49,7 +44,7 @@ const deleteCardById = (req, res) => {
   return Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        return checkCard(req, res);
+        notFound(req, res, next);
       }
       if (card.owner._id !== userId) {
         return res
@@ -65,12 +60,7 @@ const deleteCardById = (req, res) => {
             }
             return res.status(200).send(card);
           })
-          .catch((err) => {
-            if (err.name === "ValidationError") {
-              return checkValidationError(req, res, err);
-            }
-            return checkServerError(req, res);
-          })
+          .catch(next)
       );
     })
     .catch(() => {
@@ -78,7 +68,7 @@ const deleteCardById = (req, res) => {
     });
 };
 
-const likedCard = (req, res) => {
+const likedCard = (req, res, next) => {
   const { cardId } = req.params;
   if (!Types.ObjectId.isValid(cardId)) {
     return res.status(400).send({ message: "Некорректный id" });
@@ -90,13 +80,11 @@ const likedCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return checkCard(req, res);
+        notFound(req, res, next);
       }
       return res.status(200).send(card);
     })
-    .catch(() => {
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
 const dislikedCard = (req, res) => {
