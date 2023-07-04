@@ -25,9 +25,10 @@ app.use(express.static(join(__dirname, "public")));
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(notFound);
+
 app.use(routes);
 
-app.use(notFound);
 app.use(errors());
 app.use(errorHandler);
 app.use(celebrateError);

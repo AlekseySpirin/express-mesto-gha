@@ -1,10 +1,10 @@
-const { Types } = require("mongoose");
 const Card = require("../models/card");
 const {
   checkServerError,
   checkValidationError // incorrectData,
 } = require("../utils/errors");
-const { notFound } = require("../middlewares/notFound");
+const NotFoundError = require("../errors/notFoundError");
+const ForbiddenError = require("../errors/forbiddenError");
 
 const getCards = (req, res, next) => {
   return Card.find({})
@@ -15,7 +15,7 @@ const getCards = (req, res, next) => {
     .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   return Card.create({
@@ -26,53 +26,38 @@ const createCard = (req, res) => {
     .then((card) => {
       return res.status(201).send(card);
     })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return checkValidationError(req, res, err);
-      }
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
 const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
-  if (!Types.ObjectId.isValid(cardId)) {
-    return res.status(400).send({ message: "Некорректный id" });
-  }
+
+  console.log(userId);
 
   return Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        notFound(req, res, next);
+        throw new NotFoundError("Карточки не существует");
       }
-      if (card.owner._id !== userId) {
-        return res
-          .status(403)
-          .send({ message: "Нет прав на удаление карточки" });
+      if (card.owner._id.toString() !== userId.toString()) {
+        throw new ForbiddenError("Нет прав для удаления карточки");
       }
-      return (
-        Card.findByIdAndDelete(cardId)
-          // eslint-disable-next-line no-shadow
-          .then((card) => {
-            if (!card) {
-              return checkCard(req, res);
-            }
-            return res.status(200).send(card);
-          })
-          .catch(next)
-      );
+      return Card.findByIdAndDelete(cardId)
+        .then((deletedCard) => {
+          if (!deletedCard) {
+            throw new NotFoundError("Карточки не существует");
+          }
+          return res.status(200).send(deletedCard);
+        })
+        .catch(next);
     })
-    .catch(() => {
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
 const likedCard = (req, res, next) => {
   const { cardId } = req.params;
-  if (!Types.ObjectId.isValid(cardId)) {
-    return res.status(400).send({ message: "Некорректный id" });
-  }
+
   return Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
@@ -80,18 +65,16 @@ const likedCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        notFound(req, res, next);
+        throw new NotFoundError("Карточки не существует");
       }
       return res.status(200).send(card);
     })
     .catch(next);
 };
 
-const dislikedCard = (req, res) => {
+const dislikedCard = (req, res, next) => {
   const { cardId } = req.params;
-  if (!Types.ObjectId.isValid(cardId)) {
-    return res.status(400).send({ message: "Некорректный id" });
-  }
+
   return Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
@@ -99,13 +82,11 @@ const dislikedCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return checkCard(req, res);
+        throw new NotFoundError("Карточки не существует");
       }
       return res.status(200).send({ message: "Лайк удален" });
     })
-    .catch(() => {
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
 module.exports = {

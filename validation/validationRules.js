@@ -48,7 +48,7 @@ const getUserByIdValidator = celebrate({
       .required()
       .custom((value, helpers) => {
         if (!ObjectId.isValid(value)) {
-          return helpers.message("Некорректный id");
+          return helpers.message("Некорректный id пользователя");
         }
         return value;
       })

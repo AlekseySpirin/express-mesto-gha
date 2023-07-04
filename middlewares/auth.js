@@ -5,7 +5,7 @@ const auth = (req, res, next) => {
   const token = req.cookies.jwt;
   if (!verifyToken(token)) {
     const error = new Error("Нет доступа");
-    error.status = 401;
+    error.statusCode = 401;
     return next(error);
   }
   const userId = decryptToken(token);
@@ -13,7 +13,7 @@ const auth = (req, res, next) => {
     .then((user) => {
       if (!user) {
         const error = new Error("Пользователь не найден");
-        error.status = 404;
+        error.statusCode = 404;
         throw error;
       }
       req.user = user;
