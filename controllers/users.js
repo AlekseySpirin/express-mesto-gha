@@ -23,7 +23,6 @@ const getUsersById = (req, res, next) => {
   const { userId } = req.params;
 
   return User.findById(userId)
-    .orFail(new Error("NotValidId"))
     .then((user) => {
       if (!user) {
         throw new NotFoundError("Пользователь не существует");

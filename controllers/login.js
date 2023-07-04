@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { generateToken } = require("../utils/jwt");
 const UnauthorizedError = require("../errors/unauthorizedError");
-const NotFoundError = require("../errors/notFoundError");
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -14,7 +13,7 @@ const login = (req, res, next) => {
     .select("+password")
     .then((user) => {
       if (!user) {
-        throw new NotFoundError("Такого пользователя не существует");
+        throw new UnauthorizedError("Такого пользователя не существует");
       }
       return bcrypt.compare(
         password,
