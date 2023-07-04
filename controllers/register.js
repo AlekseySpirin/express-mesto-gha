@@ -1,9 +1,10 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const { checkValidationError, checkServerError } = require("../utils/errors");
+const UnauthorizedError = require("../errors/unauthorizedError");
+const ConflictError = require("../errors/сonflictError");
 
 const SALT_ROUNDS = 10;
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name = "Жак-Ив Кусто",
     about = "Исследователь",
@@ -12,13 +13,13 @@ const createUser = (req, res) => {
     password
   } = req.body;
   if (!email || !password) {
-    return res.status(400).send({ message: "Не передан email или пароль" });
+    throw new UnauthorizedError("Не передан email или пароль");
   }
 
   return User.findOne({ email })
     .then((user) => {
       if (user) {
-        return res.status(409).send({ message: "Пользователь уже существует" });
+        throw new ConflictError("Пользователь уже существует");
       }
       return bcrypt.hash(password, SALT_ROUNDS, function (err, hash) {
         return User.create({
@@ -37,12 +38,7 @@ const createUser = (req, res) => {
         });
       });
     })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return checkValidationError(req, res, err);
-      }
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
 module.exports = {

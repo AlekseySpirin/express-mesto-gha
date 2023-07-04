@@ -1,8 +1,4 @@
 const Card = require("../models/card");
-const {
-  checkServerError,
-  checkValidationError // incorrectData,
-} = require("../utils/errors");
 const NotFoundError = require("../errors/notFoundError");
 const ForbiddenError = require("../errors/forbiddenError");
 

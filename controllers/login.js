@@ -1,28 +1,27 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { generateToken } = require("../utils/jwt");
-const { checkValidationError, checkServerError } = require("../utils/errors");
+const UnauthorizedError = require("../errors/unauthorizedError");
+const NotFoundError = require("../errors/notFoundError");
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(403).send({ message: "Неправильный email или пароль" });
+    throw new UnauthorizedError("Неправильный email или пароль");
   }
 
   return User.findOne({ email })
     .select("+password")
     .then((user) => {
       if (!user) {
-        return res
-          .status(401)
-          .send({ message: "Такого пользователя не существует" });
+        throw new NotFoundError("Такого пользователя не существует");
       }
       return bcrypt.compare(
         password,
         user.password,
         function (err, isPasswordMatch) {
           if (!isPasswordMatch) {
-            return res.status(401).send({ message: "Неправильный пароль" });
+            throw new UnauthorizedError("Неправильный пароль");
           }
           const token = generateToken(user._id);
           res.cookie("jwt", token, { httpOnly: true });
@@ -32,12 +31,7 @@ const login = (req, res) => {
         }
       );
     })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return checkValidationError(req, res, err);
-      }
-      return checkServerError(req, res);
-    });
+    .catch(next);
 };
 
 module.exports = {
