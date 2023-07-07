@@ -11,7 +11,8 @@ const { notFound } = require("./middlewares/notFound");
 const { errorHandler } = require("./middlewares/errorHandler");
 const { celebrateError } = require("./middlewares/celebrateError");
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DB_URL = "mongodb://127.0.0.1:27017/mestodb" } =
+  process.env;
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
@@ -19,7 +20,7 @@ const limiter = rateLimit({
   legacyHeaders: false
 });
 mongoose
-  .connect("mongodb://127.0.0.1:27017/mestodb", {
+  .connect(DB_URL, {
     useNewUrlParser: true
   })
   .then(() => {
