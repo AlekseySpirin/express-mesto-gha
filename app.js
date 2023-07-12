@@ -29,7 +29,7 @@ mongoose
 
 const app = express();
 app.use(limiter);
-app.use(express.static(join(__dirname, "public")));
+// app.use(express.static(join(__dirname, "public")));
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(cookieParser());
