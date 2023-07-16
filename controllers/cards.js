@@ -14,6 +14,7 @@ const getCards = (req, res, next) => {
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
+
   return Card.create({
     name,
     link,
@@ -28,8 +29,6 @@ const createCard = (req, res, next) => {
 const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
-
-  console.log(userId);
 
   return Card.findById(cardId)
     .then((card) => {
@@ -53,10 +52,14 @@ const deleteCardById = (req, res, next) => {
 
 const likedCard = (req, res, next) => {
   const { cardId } = req.params;
-
+  console.log("Сработало на беке");
   return Card.findByIdAndUpdate(
     cardId,
-    { $addToSet: { likes: req.user._id } },
+    {
+      $addToSet: {
+        likes: req.user._id
+      }
+    },
     { new: true }
   )
     .then((card) => {
@@ -73,7 +76,11 @@ const dislikedCard = (req, res, next) => {
 
   return Card.findByIdAndUpdate(
     cardId,
-    { $pull: { likes: req.user._id } },
+    {
+      $pull: {
+        likes: req.user._id
+      }
+    },
     { new: true }
   )
     .then((card) => {

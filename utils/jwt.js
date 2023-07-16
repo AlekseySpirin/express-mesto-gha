@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-const JWT_SECRET = "super-puper-secret-key";
+const { JWT_SECRET = "super-puper-secret-key" } = process.env;
 const generateToken = (id) => {
-  return jwt.sign({ id }, JWT_SECRET);
+  return jwt.sign({ id }, JWT_SECRET, { expiresIn: "7d" });
 };
 
 const verifyToken = (token) => {
