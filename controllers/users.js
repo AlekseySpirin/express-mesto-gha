@@ -40,7 +40,7 @@ const updateUserById = (req, res, next) => {
   // console.log(new Error("NotValidId"));
   return User.findByIdAndUpdate(_id, newUserData, {
     new: true,
-    runValidators: true
+    runValidators: true,
   })
     .then((user) => {
       return res.status(200).send(user);
@@ -56,8 +56,8 @@ const updateUserAvatarById = (req, res, next) => {
     { avatar },
     {
       new: true,
-      runValidators: true
-    }
+      runValidators: true,
+    },
   )
     .then((user) => {
       return res.status(200).send(user);
@@ -70,5 +70,5 @@ module.exports = {
   getUsersById,
   updateUserById,
   updateUserAvatarById,
-  getCurrentUser
+  getCurrentUser,
 };

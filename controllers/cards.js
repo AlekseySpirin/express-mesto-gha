@@ -18,7 +18,7 @@ const createCard = (req, res, next) => {
   return Card.create({
     name,
     link,
-    owner
+    owner,
   })
     .then((card) => {
       return res.status(201).send(card);
@@ -57,11 +57,12 @@ const likedCard = (req, res, next) => {
     cardId,
     {
       $addToSet: {
-        likes: req.user._id
-      }
+        likes: req.user._id,
+      },
     },
-    { new: true }
+    { new: true },
   )
+    .populate("likes", "_id")
     .then((card) => {
       if (!card) {
         throw new NotFoundError("Карточки не существует");
@@ -78,16 +79,16 @@ const dislikedCard = (req, res, next) => {
     cardId,
     {
       $pull: {
-        likes: req.user._id
-      }
+        likes: req.user._id,
+      },
     },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (!card) {
         throw new NotFoundError("Карточки не существует");
       }
-      return res.status(200).send({ message: "Лайк удален" });
+      return res.status(200).send(card);
     })
     .catch(next);
 };
@@ -97,5 +98,5 @@ module.exports = {
   createCard,
   deleteCardById,
   likedCard,
-  dislikedCard
+  dislikedCard,
 };

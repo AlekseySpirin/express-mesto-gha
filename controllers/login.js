@@ -22,8 +22,8 @@ const login = (req, res, next) => {
         const token = generateToken(user._id);
         res.cookie("jwt", token, {
           maxAge: 604800,
-          httpOnly: true
-          // sameSite: true
+          httpOnly: true,
+          sameSite: true,
         });
         return res.status(200).send({ message: "Авторизация прошла успешно" });
       });
@@ -32,5 +32,5 @@ const login = (req, res, next) => {
 };
 
 module.exports = {
-  login
+  login,
 };
