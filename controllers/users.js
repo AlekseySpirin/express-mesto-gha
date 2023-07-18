@@ -37,7 +37,6 @@ const getUsersById = (req, res, next) => {
 const updateUserById = (req, res, next) => {
   const newUserData = req.body;
   const { _id } = req.user;
-  // console.log(new Error("NotValidId"));
   return User.findByIdAndUpdate(_id, newUserData, {
     new: true,
     runValidators: true,

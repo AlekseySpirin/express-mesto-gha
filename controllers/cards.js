@@ -52,7 +52,6 @@ const deleteCardById = (req, res, next) => {
 
 const likedCard = (req, res, next) => {
   const { cardId } = req.params;
-  console.log("Сработало на беке");
   return Card.findByIdAndUpdate(
     cardId,
     {
